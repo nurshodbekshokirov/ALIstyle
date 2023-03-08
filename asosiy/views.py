@@ -3,6 +3,8 @@ from django.views import View
 from .models import *
 from django.contrib.auth import login,authenticate,logout
 
+from userapp.models import Profil
+
 
 class Home2view(View):
     def get(self, request):
@@ -60,8 +62,23 @@ class Logoutview(View):
 
 class Mahsulot_bitaview(View):
     def get(self,request, pk):
+        product = Mahsulot.objects.get(id=pk)
         data = {
             'mahsulot':Mahsulot.objects.get(id=pk),
-            'izohlar':Izoh.objects.filter(id=pk)
+            'izohlar':Izoh.objects.filter(mahsulot=product),
+
         }
         return render(request, 'page-detail-product.html',data)
+    def post(self,request,pk):
+
+
+        Izoh.objects.create(
+            baho = request.POST.get('rating'),
+            matn = request.POST.get('comment'),
+            mahsulot = Mahsulot.objects.get(id=pk),
+            profil = Profil.objects.get(user=request.user)
+
+        )
+        return redirect(f'/asosiy/mahsulot/{pk}')
+
+
