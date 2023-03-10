@@ -69,6 +69,7 @@ class Mahsulot_bitaview(View):
         izoh = Izoh.objects.filter(mahsulot=product).aggregate(Count('baho'))
         if izoh['baho__count']>0:
             ortacha = Izoh.objects.filter(mahsulot=product).aggregate(Sum('baho'))['baho__sum'] / izoh['baho__count']
+            ortacha = (ortacha/5) * 100
         else:
             ortacha = 0
 
