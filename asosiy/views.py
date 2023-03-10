@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.views import View
 from .models import *
 from django.contrib.auth import login,authenticate,logout
+from django.db.models import Sum, Count
 
 from userapp.models import Profil
 
@@ -63,9 +64,18 @@ class Logoutview(View):
 class Mahsulot_bitaview(View):
     def get(self,request, pk):
         product = Mahsulot.objects.get(id=pk)
+        izohlar = Izoh.objects.filter(mahsulot=product)
+
+        izoh = Izoh.objects.filter(mahsulot=product).aggregate(Count('baho'))
+        if izoh['baho__count']>0:
+            ortacha = Izoh.objects.filter(mahsulot=product).aggregate(Sum('baho'))['baho__sum'] / izoh['baho__count']
+        else:
+            ortacha = 0
+
         data = {
             'mahsulot':Mahsulot.objects.get(id=pk),
-            'izohlar':Izoh.objects.filter(mahsulot=product),
+            'izohlar':izohlar,
+            'ortacha':ortacha
 
         }
         return render(request, 'page-detail-product.html',data)
